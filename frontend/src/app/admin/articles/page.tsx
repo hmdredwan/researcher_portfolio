@@ -22,18 +22,25 @@ function slugify(s: string) {
   return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
-const empty: Partial<Article> = {
+type EditArticle = Partial<Article> & {
+  cover_file?: File | null;
+  video_file?: File | null;
+};
+
+const empty: EditArticle = {
   title: "",
   slug: "",
   excerpt: "",
   body: "",
   published: true,
+  cover_file: null,
+  video_file: null,
 };
 
 export default function AdminArticlesPage() {
   const [items, setItems] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState<Partial<Article> | null>(null);
+  const [editing, setEditing] = useState<EditArticle | null>(null);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState<Article | null>(null);
   const { toast, show } = useToast();
@@ -51,10 +58,20 @@ export default function AdminArticlesPage() {
     e.preventDefault();
     const token = getToken();
     if (!token || !editing) return;
-    const data = { ...editing, slug: editing.slug || slugify(editing.title || "") };
+
+    const slug = editing.slug || slugify(editing.title || "");
+    const payload = new FormData();
+    payload.append("title", editing.title || "");
+    payload.append("slug", slug);
+    payload.append("excerpt", editing.excerpt || "");
+    payload.append("body", editing.body || "");
+    payload.append("published", editing.published ? "true" : "false");
+    if (editing.cover_file instanceof File) payload.append("cover", editing.cover_file);
+    if (editing.video_file instanceof File) payload.append("video", editing.video_file);
+
     setSaving(true);
     try {
-      const saved = await adminSave.article(token, data, editing.id);
+      const saved = await adminSave.article(token, payload, editing.id);
       setItems((prev) => {
         const exists = prev.some((a) => a.id === saved.id);
         return exists ? prev.map((a) => (a.id === saved.id ? saved : a)) : [saved, ...prev];
@@ -134,6 +151,38 @@ export default function AdminArticlesPage() {
             </Field>
             <Field label="Excerpt">
               <input className="input" value={editing.excerpt || ""} onChange={(e) => setEditing({ ...editing, excerpt: e.target.value })} placeholder="Short summary shown in cards" />
+            </Field>
+            <Field label="Cover image">
+              <input
+                type="file"
+                accept="image/*"
+                className="input"
+                onChange={(e) => setEditing({ ...editing, cover_file: e.target.files?.[0] ?? null })}
+              />
+              {(editing.cover_url || editing.cover) && !editing.cover_file && (
+                <p className="mt-2 text-sm text-ink-500">
+                  Current cover: <a href={editing.cover_url || editing.cover!} target="_blank" rel="noreferrer" className="text-indigo-600 hover:underline">View</a>
+                </p>
+              )}
+              {editing.cover_file && (
+                <p className="mt-2 text-sm text-ink-500">Selected image: {editing.cover_file.name}</p>
+              )}
+            </Field>
+            <Field label="Video file">
+              <input
+                type="file"
+                accept="video/*"
+                className="input"
+                onChange={(e) => setEditing({ ...editing, video_file: e.target.files?.[0] ?? null })}
+              />
+              {(editing.video_url || editing.video) && !editing.video_file && (
+                <p className="mt-2 text-sm text-ink-500">
+                  Current video: <a href={editing.video_url || editing.video!} target="_blank" rel="noreferrer" className="text-indigo-600 hover:underline">View</a>
+                </p>
+              )}
+              {editing.video_file && (
+                <p className="mt-2 text-sm text-ink-500">Selected video: {editing.video_file.name}</p>
+              )}
             </Field>
             <Field label="Body (separate paragraphs with a blank line)">
               <textarea className="input resize-none" rows={9} value={editing.body || ""} onChange={(e) => setEditing({ ...editing, body: e.target.value })} />

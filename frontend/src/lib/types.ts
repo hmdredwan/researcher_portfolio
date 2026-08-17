@@ -50,7 +50,19 @@ export interface Article {
   excerpt: string;
   body: string;
   cover: string | null;
+  video: string | null;
+  cover_url?: string | null;
+  video_url?: string | null;
   published: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Notice {
+  id: number;
+  text: string;
+  link: string;
+  is_active: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -70,4 +82,21 @@ export interface Stats {
   books: number;
   articles: number;
   messages_unread: number;
+  gallery: number;
+}
+
+export interface GalleryItem {
+  id: number;
+  category: "video" | "short" | "image";
+  title: string;
+  caption: string;
+  youtube_url: string;
+  file: string | null;
+  thumbnail: string | null;
+  file_url: string | null;
+  thumbnail_url: string | null;
+  order: number;
+  published: boolean;
+  created_at: string;
+  updated_at: string;
 }

@@ -1,9 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Menu, X, GraduationCap } from "lucide-react";
+import { Menu, X } from "lucide-react";
 
 const links = [
   { href: "/", label: "Home" },
@@ -11,6 +12,7 @@ const links = [
   { href: "/papers", label: "Papers" },
   { href: "/books", label: "Books" },
   { href: "/articles", label: "Articles" },
+  { href: "/gallery", label: "Gallery" },
   { href: "/contact", label: "Contact" },
 ];
 
@@ -21,11 +23,14 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b border-ink-100 bg-white/80 backdrop-blur-md">
       <nav className="container-page flex h-16 items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 font-serif text-lg font-bold text-ink-900">
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-indigo-600 text-white">
-            <GraduationCap size={20} />
+        <Link href="/" className="flex items-center gap-3 font-sans text-sm font-semibold text-ink-900 sm:text-base">
+          <span className="relative h-11 w-11 overflow-hidden rounded-3xl bg-indigo-600 text-white shadow-lg shadow-indigo-200/50">
+            <Image src="/images/logo.png" alt="Theory of Mahdi logo" fill className="object-cover" />
           </span>
-          <span className="hidden sm:inline">Mehedi Hasan</span>
+          <div className="flex flex-col leading-tight">
+            <span className="uppercase tracking-[0.32em] text-ink-500">Theory of</span>
+            <span className="text-base uppercase font-black tracking-tight text-ink-900 sm:text-lg">Mahdi</span>
+          </div>
         </Link>
 
         <div className="hidden items-center gap-1 md:flex">

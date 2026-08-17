@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { FileText, BookOpen, ArrowUpRight, Calendar } from "lucide-react";
 import type { Paper, Book, Article } from "@/lib/types";
 import { tagsToArray, formatDate } from "@/lib/utils";
@@ -102,19 +103,32 @@ export function BookCard({ book }: { book: Book }) {
 export function ArticleCard({ article }: { article: Article }) {
   return (
     <Link href={`/articles/${article.slug}`} className="card group flex flex-col">
-      <div className="flex items-center gap-2 text-xs text-ink-400">
-        <Calendar size={14} />
-        <span>{formatDate(article.created_at)}</span>
+      {(article.cover_url || article.cover) && (
+        <div className="overflow-hidden rounded-t-2xl">
+          <Image
+            src={article.cover_url || article.cover!}
+            alt={article.title}
+            width={1200}
+            height={675}
+            className="aspect-video w-full object-cover"
+          />
+        </div>
+      )}
+      <div className="flex flex-col">
+        <div className="flex items-center gap-2 text-xs text-ink-400">
+          <Calendar size={14} />
+          <span>{formatDate(article.created_at)}</span>
+        </div>
+        <h3 className="mt-3 font-serif text-xl font-bold leading-snug text-ink-900 group-hover:text-indigo-700">
+          {article.title}
+        </h3>
+        <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-ink-600">
+          {article.excerpt}
+        </p>
+        <span className="mt-auto inline-flex items-center gap-1 pt-4 text-sm font-semibold text-indigo-600 group-hover:gap-2">
+          Read article <ArrowUpRight size={14} />
+        </span>
       </div>
-      <h3 className="mt-3 font-serif text-xl font-bold leading-snug text-ink-900 group-hover:text-indigo-700">
-        {article.title}
-      </h3>
-      <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-ink-600">
-        {article.excerpt}
-      </p>
-      <span className="mt-auto inline-flex items-center gap-1 pt-4 text-sm font-semibold text-indigo-600 group-hover:gap-2">
-        Read article <ArrowUpRight size={14} />
-      </span>
     </Link>
   );
 }

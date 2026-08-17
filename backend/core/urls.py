@@ -11,6 +11,7 @@ urlpatterns = [
     path("articles/", views.public_article_list, name="public-article-list"),
     path("articles/<slug:slug>/", views.public_article_detail, name="public-article-detail"),
     path("contact/", views.public_contact, name="public-contact"),
+    path("notices/", views.public_notice_list, name="public-notices"),
 
     # Admin auth
     path("admin/login/", views.admin_login, name="admin-login"),
@@ -31,7 +32,18 @@ urlpatterns = [
     path("admin/articles/", views.admin_article_list, name="admin-article-list"),
     path("admin/articles/<int:pk>/", views.admin_article_detail, name="admin-article-detail"),
 
+    # Admin notices
+    path("admin/notices/", views.admin_notice_list, name="admin-notice-list"),
+    path("admin/notices/<int:pk>/", views.admin_notice_detail, name="admin-notice-detail"),
+
     # Admin messages
     path("admin/messages/", views.admin_message_list, name="admin-message-list"),
     path("admin/messages/<int:pk>/", views.admin_message_detail, name="admin-message-detail"),
+
+    # Public gallery
+    path("gallery/", views.public_gallery_list, name="public-gallery-list"),
+
+    # Admin gallery
+    path("admin/gallery/", views.admin_gallery_list, name="admin-gallery-list"),
+    path("admin/gallery/<int:pk>/", views.admin_gallery_detail, name="admin-gallery-detail"),
 ]

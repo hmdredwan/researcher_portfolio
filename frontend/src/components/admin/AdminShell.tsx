@@ -9,12 +9,14 @@ import {
   BookOpen,
   PenLine,
   Mail,
+  Bell,
   User,
   LogOut,
   Menu,
   X,
   ExternalLink,
   GraduationCap,
+  Image,
 } from "lucide-react";
 
 const nav = [
@@ -22,6 +24,8 @@ const nav = [
   { href: "/admin/papers", label: "Papers", icon: FileText },
   { href: "/admin/books", label: "Books", icon: BookOpen },
   { href: "/admin/articles", label: "Articles", icon: PenLine },
+  { href: "/admin/gallery", label: "Gallery", icon: Image },
+  { href: "/admin/notices", label: "Notices", icon: Bell },
   { href: "/admin/messages", label: "Messages", icon: Mail },
   { href: "/admin/profile", label: "Profile", icon: User },
 ];

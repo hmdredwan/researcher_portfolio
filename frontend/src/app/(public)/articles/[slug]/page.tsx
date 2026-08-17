@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Calendar, ArrowRight } from "lucide-react";
@@ -48,7 +49,29 @@ export default async function ArticleDetailPage({
         )}
       </header>
 
-      <div className="mx-auto mt-10 max-w-3xl">
+      <div className="mx-auto mt-10 max-w-3xl space-y-8">
+        {(article.cover_url || article.cover) && (
+          <div className="overflow-hidden rounded-3xl border border-ink-100 shadow-sm">
+            <Image
+              src={article.cover_url || article.cover!}
+              alt={article.title}
+              width={1200}
+              height={675}
+              className="aspect-video w-full object-cover"
+            />
+          </div>
+        )}
+
+        {(article.video_url || article.video) && (
+          <div className="overflow-hidden rounded-3xl border border-ink-100 bg-ink-950 shadow-sm">
+            <video
+              controls
+              className="aspect-video w-full bg-black"
+              src={article.video_url || article.video!}
+            />
+          </div>
+        )}
+
         <div className="prose-rich">
           {article.body.split("\n\n").map((para, i) => (
             <p key={i}>{para}</p>

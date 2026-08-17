@@ -5,12 +5,12 @@ import { getResearcher } from "@/lib/api";
 export const revalidate = 60;
 
 const interests = [
-  "Machine Learning",
-  "Natural Language Processing",
-  "Computer Vision",
-  "Explainable AI",
-  "Federated Learning",
-  "AI for Social Good",
+  "Unified Theory",
+  "Theoretical Physics",
+  "Quantum Gravity",
+  "Fundamental Forces",
+  "Cosmology & Astrophysics",
+  "Foundations of Physics",
 ];
 
 const timeline = [

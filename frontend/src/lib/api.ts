@@ -3,19 +3,22 @@ import type {
   Paper,
   Book,
   Article,
+  Notice,
   ContactMessage,
   Stats,
+  GalleryItem,
 } from "./types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api";
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const headers = init?.body instanceof FormData
+    ? { ...(init?.headers || {}) }
+    : { "Content-Type": "application/json", ...(init?.headers || {}) };
+
   const res = await fetch(`${API_URL}${path}`, {
     ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...(init?.headers || {}),
-    },
+    headers,
     cache: "no-store",
   });
   if (!res.ok) {
@@ -29,11 +32,16 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
 export const getResearcher = () => request<Researcher>("/researcher/");
 export const getStats = () => request<Stats>("/stats/");
+export const getNotices = () => request<Notice[]>("/notices/");
 export const getPapers = () => request<Paper[]>("/papers/");
 export const getPaper = (id: number) => request<Paper>(`/papers/${id}/`);
 export const getBooks = () => request<Book[]>("/books/");
 export const getArticles = () => request<Article[]>("/articles/");
 export const getArticle = (slug: string) => request<Article>(`/articles/${slug}/`);
+export const getGallery = (category?: string) => {
+  const url = category ? `/gallery/?category=${encodeURIComponent(category)}` : "/gallery/";
+  return request<GalleryItem[]>(url);
+};
 
 export async function sendContact(payload: {
   name: string;
@@ -77,7 +85,9 @@ export const adminList = {
   papers: (token: string) => request<Paper[]>("/admin/papers/", { headers: authHeader(token) }),
   books: (token: string) => request<Book[]>("/admin/books/", { headers: authHeader(token) }),
   articles: (token: string) => request<Article[]>("/admin/articles/", { headers: authHeader(token) }),
+  notices: (token: string) => request<Notice[]>("/admin/notices/", { headers: authHeader(token) }),
   messages: (token: string) => request<ContactMessage[]>("/admin/messages/", { headers: authHeader(token) }),
+  gallery: (token: string) => request<GalleryItem[]>("/admin/gallery/", { headers: authHeader(token) }),
   researcher: (token: string) => request<Researcher>("/admin/researcher/", { headers: authHeader(token) }),
 };
 
@@ -94,23 +104,41 @@ export const adminSave = {
       headers: authHeader(token),
       body: JSON.stringify(data),
     }),
-  article: (token: string, data: Partial<Article>, id?: number) =>
-    request<Article>(id ? `/admin/articles/${id}/` : "/admin/articles/", {
+  article: (token: string, data: Partial<Article> | FormData, id?: number) => {
+    const isFormData = data instanceof FormData || (data && typeof data === "object" && data.constructor?.name === "FormData");
+    const body: BodyInit = isFormData ? (data as FormData) : JSON.stringify(data as Partial<Article>);
+    return request<Article>(id ? `/admin/articles/${id}/` : "/admin/articles/", {
       method: id ? "PUT" : "POST",
       headers: authHeader(token),
-      body: JSON.stringify(data),
-    }),
+      body,
+    });
+  },
   researcher: (token: string, data: Partial<Researcher>) =>
     request<Researcher>("/admin/researcher/", {
       method: "PUT",
       headers: authHeader(token),
       body: JSON.stringify(data),
     }),
+  notice: (token: string, data: Partial<Notice>, id?: number) =>
+    request<Notice>(id ? `/admin/notices/${id}/` : "/admin/notices/", {
+      method: id ? "PUT" : "POST",
+      headers: authHeader(token),
+      body: JSON.stringify(data),
+    }),
+  gallery: (token: string, data: Partial<GalleryItem> | FormData, id?: number) => {
+    const isFormData = data instanceof FormData || (data && typeof data === "object" && data.constructor?.name === "FormData");
+    const body: BodyInit = isFormData ? (data as FormData) : JSON.stringify(data as Partial<GalleryItem>);
+    return request<GalleryItem>(id ? `/admin/gallery/${id}/` : "/admin/gallery/", {
+      method: id ? "PUT" : "POST",
+      headers: authHeader(token),
+      body,
+    });
+  },
 };
 
 export function adminDelete(
   token: string,
-  kind: "papers" | "books" | "articles" | "messages",
+  kind: "papers" | "books" | "articles" | "notices" | "messages" | "gallery",
   id: number,
 ) {
   return request<{ detail: string }>(`/admin/${kind}/${id}/`, {

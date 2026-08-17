@@ -3,13 +3,15 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse, Http404
 
-from .models import Researcher, Paper, Book, Article, ContactMessage
+from .models import Researcher, Paper, Book, Article, ContactMessage, GalleryItem, Notice
 from .serializers import (
     ResearcherSerializer,
     PaperSerializer,
     BookSerializer,
     ArticleSerializer,
     ContactMessageSerializer,
+    GalleryItemSerializer,
+    NoticeSerializer,
 )
 from .permissions import require_admin
 
@@ -26,9 +28,20 @@ def _body(request):
 
 
 def _crud_payload(request, serializer_class, obj=None, partial=False):
-    """Build serializer from JSON body and validate, returning (instance, response_or_None)."""
-    data = _body(request)
-    serializer = serializer_class(data=data, instance=obj, partial=partial)
+    """Build serializer from request data and files, returning (instance, response_or_None)."""
+    if request.content_type and request.content_type.startswith("multipart/form-data"):
+        request._load_post_and_files()
+        data = request.POST.dict()
+        data.update(request.FILES.dict())
+        serializer = serializer_class(
+            data=data,
+            instance=obj,
+            partial=partial,
+            context={"request": request},
+        )
+    else:
+        data = _body(request)
+        serializer = serializer_class(data=data, instance=obj, partial=partial, context={"request": request})
     if not serializer.is_valid():
         return None, _json(serializer.errors, status=400)
     serializer.save()
@@ -105,6 +118,7 @@ def public_stats(request):
         "books": Book.objects.count(),
         "articles": Article.objects.filter(published=True).count(),
         "messages_unread": ContactMessage.objects.filter(is_read=False).count(),
+        "gallery": GalleryItem.objects.count(),
     })
 
 
@@ -236,14 +250,17 @@ def admin_article_list(request):
     if request.method == "GET":
         qs = Article.objects.all()
         return _json(ArticleSerializer(qs, many=True, context={"request": request}).data)
-    obj, err = _crud_payload(request, ArticleSerializer)
-    if err:
-        return err
-    return _json(ArticleSerializer(obj, context={"request": request}).data, status=201)
+    try:
+        obj, err = _crud_payload(request, ArticleSerializer)
+        if err:
+            return err
+        return _json(ArticleSerializer(obj, context={"request": request}).data, status=201)
+    except Exception as exc:
+        return _json({"detail": str(exc), "type": type(exc).__name__}, status=500)
 
 
 @csrf_exempt
-@require_http_methods(["GET", "PUT", "DELETE"])
+@require_http_methods(["GET", "POST", "PUT", "DELETE"])
 @require_admin
 def admin_article_detail(request, pk):
     try:
@@ -255,10 +272,45 @@ def admin_article_detail(request, pk):
     if request.method == "DELETE":
         obj.delete()
         return _json({"detail": "Deleted."})
-    obj, err = _crud_payload(request, ArticleSerializer, obj=obj, partial=True)
+    try:
+        obj, err = _crud_payload(request, ArticleSerializer, obj=obj, partial=True)
+        if err:
+            return err
+        return _json(ArticleSerializer(obj, context={"request": request}).data)
+    except Exception as exc:
+        return _json({"detail": str(exc), "type": exc.__class__.__name__}, status=500)
+
+
+@csrf_exempt
+@require_http_methods(["GET", "POST"])
+@require_admin
+def admin_notice_list(request):
+    if request.method == "GET":
+        qs = Notice.objects.all()
+        return _json(NoticeSerializer(qs, many=True).data)
+    obj, err = _crud_payload(request, NoticeSerializer)
     if err:
         return err
-    return _json(ArticleSerializer(obj, context={"request": request}).data)
+    return _json(NoticeSerializer(obj).data, status=201)
+
+
+@csrf_exempt
+@require_http_methods(["GET", "PUT", "DELETE"])
+@require_admin
+def admin_notice_detail(request, pk):
+    try:
+        obj = Notice.objects.get(pk=pk)
+    except Notice.DoesNotExist:
+        raise Http404
+    if request.method == "GET":
+        return _json(NoticeSerializer(obj).data)
+    if request.method == "DELETE":
+        obj.delete()
+        return _json({"detail": "Deleted."})
+    obj, err = _crud_payload(request, NoticeSerializer, obj=obj, partial=True)
+    if err:
+        return err
+    return _json(NoticeSerializer(obj).data)
 
 
 @csrf_exempt
@@ -286,3 +338,54 @@ def admin_message_detail(request, pk):
             obj.is_read = bool(data["is_read"])
             obj.save(update_fields=["is_read"])
     return _json(ContactMessageSerializer(obj).data)
+
+
+# ---------------------------------------------------------------- gallery
+
+
+@require_http_methods(["GET"])
+def public_notice_list(request):
+    qs = Notice.objects.filter(is_active=True)[:8]
+    return _json(NoticeSerializer(qs, many=True).data)
+
+
+@require_http_methods(["GET"])
+def public_gallery_list(request):
+    qs = GalleryItem.objects.filter(published=True)
+    category = request.GET.get("category")
+    valid_categories = dict(GalleryItem.CATEGORY_CHOICES).keys()
+    if category in valid_categories:
+        qs = qs.filter(category=category)
+    return _json(GalleryItemSerializer(qs, many=True, context={"request": request}).data)
+
+
+@csrf_exempt
+@require_http_methods(["GET", "POST"])
+@require_admin
+def admin_gallery_list(request):
+    if request.method == "GET":
+        qs = GalleryItem.objects.all()
+        return _json(GalleryItemSerializer(qs, many=True, context={"request": request}).data)
+    obj, err = _crud_payload(request, GalleryItemSerializer)
+    if err:
+        return err
+    return _json(GalleryItemSerializer(obj, context={"request": request}).data, status=201)
+
+
+@csrf_exempt
+@require_http_methods(["GET", "PUT", "DELETE"])
+@require_admin
+def admin_gallery_detail(request, pk):
+    try:
+        obj = GalleryItem.objects.get(pk=pk)
+    except GalleryItem.DoesNotExist:
+        raise Http404
+    if request.method == "GET":
+        return _json(GalleryItemSerializer(obj, context={"request": request}).data)
+    if request.method == "DELETE":
+        obj.delete()
+        return _json({"detail": "Deleted."})
+    obj, err = _crud_payload(request, GalleryItemSerializer, obj=obj, partial=True)
+    if err:
+        return err
+    return _json(GalleryItemSerializer(obj, context={"request": request}).data)

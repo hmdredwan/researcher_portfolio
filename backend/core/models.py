@@ -101,6 +101,7 @@ class Article(models.Model):
     excerpt = models.CharField(max_length=500, blank=True)
     body = models.TextField(blank=True)
     cover = models.ImageField(upload_to="covers/", blank=True, null=True)
+    video = models.FileField(upload_to="articles/videos/", blank=True, null=True)
     published = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -110,6 +111,48 @@ class Article(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class GalleryItem(models.Model):
+    VIDEO = "video"
+    SHORT = "short"
+    IMAGE = "image"
+    CATEGORY_CHOICES = [
+        (VIDEO, "Video"),
+        (SHORT, "Short"),
+        (IMAGE, "Image"),
+    ]
+
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
+    title = models.CharField(max_length=400, blank=True)
+    caption = models.TextField(blank=True)
+    youtube_url = models.URLField(blank=True)
+    file = models.FileField(upload_to="gallery/", blank=True, null=True)
+    thumbnail = models.ImageField(upload_to="gallery/thumbs/", blank=True, null=True)
+    order = models.IntegerField(default=0)
+    published = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["order", "-created_at"]
+
+    def __str__(self):
+        return f"{self.get_category_display()}: {self.title or self.pk}"
+
+
+class Notice(models.Model):
+    text = models.CharField(max_length=220)
+    link = models.URLField(blank=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return self.text[:80]
 
 
 class ContactMessage(models.Model):

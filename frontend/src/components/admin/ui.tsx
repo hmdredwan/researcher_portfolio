@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { CheckCircle2, AlertCircle, X } from "lucide-react";
 
 export function AdminButton({
@@ -96,10 +96,12 @@ export function Toast({ message, type }: { message: string; type: "success" | "e
 
 export function useToast() {
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
-  function show(message: string, type: "success" | "error" = "success") {
+
+  const show = useCallback((message: string, type: "success" | "error" = "success") => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
-  }
+  }, []);
+
   return { toast, show };
 }
 

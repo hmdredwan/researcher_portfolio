@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { FileText, BookOpen, PenLine, Mail, ArrowRight } from "lucide-react";
+import { FileText, BookOpen, PenLine, Mail, ArrowRight, Image } from "lucide-react";
 import { getToken } from "@/lib/auth";
 import { adminList, getStats } from "@/lib/api";
 import type { ContactMessage, Stats } from "@/lib/types";
@@ -34,7 +34,8 @@ export default function AdminDashboardPage() {
     { label: "Papers", value: stats?.papers ?? 0, icon: FileText, href: "/admin/papers", color: "bg-indigo-50 text-indigo-600" },
     { label: "Books", value: stats?.books ?? 0, icon: BookOpen, href: "/admin/books", color: "bg-emerald-50 text-emerald-600" },
     { label: "Articles", value: stats?.articles ?? 0, icon: PenLine, href: "/admin/articles", color: "bg-amber-50 text-amber-600" },
-    { label: "Unread messages", value: stats?.messages_unread ?? 0, icon: Mail, href: "/admin/messages", color: "bg-rose-50 text-rose-600" },
+    { label: "Gallery", value: stats?.gallery ?? 0, icon: Image, href: "/admin/gallery", color: "bg-rose-50 text-rose-600" },
+    { label: "Unread messages", value: stats?.messages_unread ?? 0, icon: Mail, href: "/admin/messages", color: "bg-sky-50 text-sky-600" },
   ];
 
   return (
@@ -44,7 +45,7 @@ export default function AdminDashboardPage() {
         <p className="mt-1 text-ink-500">Here&apos;s an overview of your portfolio.</p>
       </div>
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {cards.map((c) => {
           const Icon = c.icon;
           return (
