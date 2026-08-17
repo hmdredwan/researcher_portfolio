@@ -83,6 +83,9 @@ export interface Stats {
   articles: number;
   messages_unread: number;
   gallery: number;
+  videos: number;
+  shorts: number;
+  images: number;
 }
 
 export interface GalleryItem {

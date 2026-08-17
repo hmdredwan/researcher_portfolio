@@ -21,7 +21,10 @@ export const dummyStats: Stats = {
   books: 3,
   articles: 8,
   messages_unread: 0,
-  gallery: 0,
+  gallery: 15,
+  videos: 5,
+  shorts: 4,
+  images: 6,
 };
 
 export const dummyPapers: Paper[] = [

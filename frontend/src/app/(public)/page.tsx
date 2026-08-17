@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, FileText, BookOpen, PenLine, Sparkles, MapPin, Megaphone } from "lucide-react";
+import { ArrowRight, FileText, BookOpen, PenLine, Sparkles, MapPin, Megaphone, Play, Clapperboard, Image } from "lucide-react";
 import { getResearcher, getStats, getPapers, getArticles, getNotices } from "@/lib/api";
 import { dummyResearcher, dummyStats, dummyPapers, dummyArticles, dummyNotices } from "@/lib/dummyData";
 import { PaperCard, ArticleCard } from "@/components/Cards";
@@ -65,6 +65,22 @@ export default async function HomePage() {
   let articles: Awaited<ReturnType<typeof getArticles>> = [];
   let notices: Awaited<ReturnType<typeof getNotices>> = [];
 
+  // try {
+  //   [researcher, stats, papers, articles, notices] = await Promise.all([
+  //     getResearcher(),
+  //     getStats(),
+  //     getPapers(),
+  //     getArticles(),
+  //     getNotices(),
+  //   ]);
+  // } catch {
+  //   researcher = dummyResearcher;
+  //   stats = dummyStats;
+  //   papers = dummyPapers;
+  //   articles = dummyArticles;
+  //   notices = dummyNotices;
+  // }
+
   try {
     [researcher, stats, papers, articles, notices] = await Promise.all([
       getResearcher(),
@@ -74,12 +90,16 @@ export default async function HomePage() {
       getNotices(),
     ]);
   } catch {
-    researcher = dummyResearcher;
-    stats = dummyStats;
-    papers = dummyPapers;
-    articles = dummyArticles;
-    notices = dummyNotices;
+    // will fallback below
   }
+
+  // Fallback to dummy data when API returns empty
+  if (!researcher || (Array.isArray(researcher) && researcher.length === 0)) researcher = dummyResearcher;
+  if (!stats) stats = dummyStats;
+  if (!papers || papers.length === 0) papers = dummyPapers;
+  if (!articles || articles.length === 0) articles = dummyArticles;
+  if (!notices || notices.length === 0) notices = dummyNotices;
+
 
   const featuredPapers = papers.filter((p) => p.featured).slice(0, 3);
   const latestArticles = articles.slice(0, 3);
@@ -238,6 +258,15 @@ export default async function HomePage() {
                   </Link>
                   <Link href="/articles">
                     <Stat icon={<PenLine size={18} />} value={stats?.articles ?? 0} label="Articles" isLink />
+                  </Link>
+                  <Link href="/gallery">
+                    <Stat icon={<Play size={18} />} value={stats?.videos ?? 0} label="Videos" isLink />
+                  </Link>
+                  <Link href="/gallery">
+                    <Stat icon={<Clapperboard size={18} />} value={stats?.shorts ?? 0} label="Shorts" isLink />
+                  </Link>
+                  <Link href="/gallery">
+                    <Stat icon={<Image size={18} />} value={stats?.images ?? 0} label="Images" isLink />
                   </Link>
                 </div>
                 <div className="mt-6 rounded-2xl bg-white/5 p-4 border border-white/10 hover:border-indigo-400/50 transition-colors duration-500">

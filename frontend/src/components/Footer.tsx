@@ -63,8 +63,8 @@ export default function Footer({ researcher }: { researcher?: Researcher }) {
 
       <div className="border-t border-ink-100">
         <div className="container-page flex flex-col items-center justify-between gap-2 py-5 text-xs text-ink-400 sm:flex-row">
-          <p>© {new Date().getFullYear()} {r?.name || "AKM Mehedi Hasan"}. All rights reserved.</p>
-          <p>Built with Next.js &amp; Django</p>
+          <b><p>© {new Date().getFullYear()} {r?.name || "AKM Mehedi Hasan"}. All rights reserved.</p></b>
+          {/* <p>Built with Next.js &amp; Django</p> */}
         </div>
       </div>
     </footer>

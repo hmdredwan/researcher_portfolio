@@ -119,6 +119,9 @@ def public_stats(request):
         "articles": Article.objects.filter(published=True).count(),
         "messages_unread": ContactMessage.objects.filter(is_read=False).count(),
         "gallery": GalleryItem.objects.count(),
+        "videos": GalleryItem.objects.filter(category="video").count(),
+        "shorts": GalleryItem.objects.filter(category="short").count(),
+        "images": GalleryItem.objects.filter(category="image").count(),
     })
 
 
