@@ -1,8 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { ArrowLeft, Calendar, ArrowRight } from "lucide-react";
 import { getArticle, getArticles } from "@/lib/api";
+import { dummyArticle, dummyArticles } from "@/lib/dummyData";
 import { formatDate } from "@/lib/utils";
 
 export const revalidate = 60;
@@ -12,7 +12,7 @@ export async function generateStaticParams() {
     const articles = await getArticles();
     return articles.map((a) => ({ slug: a.slug }));
   } catch {
-    return [];
+    return dummyArticles.map((a) => ({ slug: a.slug }));
   }
 }
 
@@ -21,14 +21,13 @@ export default async function ArticleDetailPage({
 }: {
   params: { slug: string };
 }) {
-  let article: Awaited<ReturnType<typeof getArticle>> | undefined;
+  let article: Awaited<ReturnType<typeof getArticle>> = dummyArticle;
   try {
-    article = await getArticle(params.slug);
+    const fetched = await getArticle(params.slug);
+    if (fetched) article = fetched;
   } catch {
-    notFound();
+    // use dummyArticle
   }
-
-  if (!article) notFound();
 
   return (
     <article className="container-page py-16">

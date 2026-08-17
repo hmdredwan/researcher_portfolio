@@ -1,4 +1,5 @@
 import { getArticles } from "@/lib/api";
+import { dummyArticles } from "@/lib/dummyData";
 import { ArticleCard } from "@/components/Cards";
 import { PageHeader } from "@/components/PageHeader";
 
@@ -8,7 +9,9 @@ export default async function ArticlesPage() {
   let articles: Awaited<ReturnType<typeof getArticles>> = [];
   try {
     articles = await getArticles();
-  } catch {}
+  } catch {
+    articles = dummyArticles;
+  }
 
   return (
     <div className="container-page py-16">

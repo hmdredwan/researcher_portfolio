@@ -1,4 +1,5 @@
 import { getPapers } from "@/lib/api";
+import { dummyPapers } from "@/lib/dummyData";
 import PapersExplorer from "./PapersExplorer";
 import { PageHeader } from "@/components/PageHeader";
 
@@ -8,7 +9,9 @@ export default async function PapersPage() {
   let papers: Awaited<ReturnType<typeof getPapers>> = [];
   try {
     papers = await getPapers();
-  } catch {}
+  } catch {
+    papers = dummyPapers;
+  }
 
   return (
     <div className="container-page py-16">

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Github, Linkedin, Globe, Mail, GraduationCap, MapPin } from "lucide-react";
 import { getResearcher } from "@/lib/api";
+import { dummyResearcher } from "@/lib/dummyData";
 
 export const revalidate = 60;
 
@@ -24,7 +25,9 @@ export default async function AboutPage() {
   let r: Awaited<ReturnType<typeof getResearcher>> | undefined;
   try {
     r = await getResearcher();
-  } catch {}
+  } catch {
+    r = dummyResearcher;
+  }
 
   return (
     <div className="container-page py-16">

@@ -1,4 +1,5 @@
 import { getBooks } from "@/lib/api";
+import { dummyBooks } from "@/lib/dummyData";
 import { BookCard } from "@/components/Cards";
 import { PageHeader } from "@/components/PageHeader";
 
@@ -8,7 +9,9 @@ export default async function BooksPage() {
   let books: Awaited<ReturnType<typeof getBooks>> = [];
   try {
     books = await getBooks();
-  } catch {}
+  } catch {
+    books = dummyBooks;
+  }
 
   return (
     <div className="container-page py-16">

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, FileText, BookOpen, PenLine, Sparkles, MapPin, Megaphone } from "lucide-react";
 import { getResearcher, getStats, getPapers, getArticles, getNotices } from "@/lib/api";
+import { dummyResearcher, dummyStats, dummyPapers, dummyArticles, dummyNotices } from "@/lib/dummyData";
 import { PaperCard, ArticleCard } from "@/components/Cards";
 import { initials } from "@/lib/utils";
 
@@ -73,7 +74,11 @@ export default async function HomePage() {
       getNotices(),
     ]);
   } catch {
-    // graceful fallback if API is down
+    researcher = dummyResearcher;
+    stats = dummyStats;
+    papers = dummyPapers;
+    articles = dummyArticles;
+    notices = dummyNotices;
   }
 
   const featuredPapers = papers.filter((p) => p.featured).slice(0, 3);
