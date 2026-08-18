@@ -10,8 +10,10 @@ export default async function BooksPage() {
   try {
     books = await getBooks();
   } catch {
-    books = dummyBooks;
+    // will fallback below
   }
+
+  if (!books || books.length === 0) books = dummyBooks;
 
   return (
     <div className="container-page py-16">

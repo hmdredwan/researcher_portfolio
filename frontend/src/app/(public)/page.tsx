@@ -79,7 +79,7 @@ export default async function HomePage() {
 
   // Fallback to dummy data when API returns empty
   if (!researcher || (Array.isArray(researcher) && researcher.length === 0)) researcher = dummyResearcher;
-  if (!stats) stats = dummyStats;
+  if (!stats || (stats.papers === 0 && stats.books === 0 && stats.articles === 0)) stats = dummyStats;
   if (!papers || papers.length === 0) papers = dummyPapers;
   if (!articles || articles.length === 0) articles = dummyArticles;
   if (!notices || notices.length === 0) notices = dummyNotices;
@@ -121,25 +121,15 @@ export default async function HomePage() {
       <section className="relative overflow-hidden bg-ink-900 text-white">
         {/* Animated background elements */}
         <div className="absolute inset-0 overflow-hidden">
-          {/* Large gradient orb 1 - Primary */}
           <div className="absolute -top-64 -left-64 h-96 w-96 animate-float-smooth-1 rounded-full bg-gradient-to-br from-indigo-600/40 via-indigo-500/20 to-transparent blur-3xl" />
-          
-          {/* Large gradient orb 2 - Secondary */}
           <div className="absolute -bottom-40 -right-40 h-full w-full animate-float-smooth-2 rounded-full bg-gradient-to-tl from-cyan-500/25 via-indigo-500/10 to-transparent blur-3xl" />
-          
-          {/* Mid-range accent orb */}
           <div className="absolute top-1/3 right-1/4 h-80 w-80 animate-glow-pulse rounded-full bg-gradient-to-br from-purple-600/20 to-indigo-400/10 blur-2xl" />
-          
-          {/* Left accent orb */}
           <div className="absolute top-2/3 left-1/4 h-72 w-72 animate-glow-pulse-delayed rounded-full bg-gradient-to-tr from-indigo-500/15 to-cyan-400/5 blur-2xl" />
-          
-          {/* Floating particles */}
           <div className="absolute top-1/4 left-1/2 h-2 w-2 animate-float rounded-full bg-indigo-300/30" />
           <div className="absolute top-3/4 right-1/3 h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-300/20" />
           <div className="absolute top-1/2 right-1/4 h-2 w-2 animate-float-delayed rounded-full bg-indigo-200/25" />
         </div>
         
-        {/* Light rays effect */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -inset-full animate-light-ray" style={{
             background: 'linear-gradient(90deg, transparent, rgba(129, 140, 248, 0.15), transparent)',
@@ -153,16 +143,10 @@ export default async function HomePage() {
           }} />
         </div>
         
-        {/* Grid pattern overlay */}
         <div className="absolute inset-0 bg-hero-grid opacity-50" />
-        
-        {/* Smooth gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-b from-ink-900/10 via-ink-900/50 to-ink-900/90" />
-        
-        {/* Secondary gradient overlay for depth */}
         <div className="absolute inset-0 bg-gradient-to-r from-indigo-950/20 via-ink-900/0 to-cyan-950/20" />
         
-        {/* Subtle noise texture */}
         <div className="absolute inset-0 opacity-15" style={{
           backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="5" /%3E%3C/filter%3E%3Crect width="400" height="400" fill="white" filter="url(%23noiseFilter)" /%3E%3C/svg%3E")',
         }} />
@@ -199,10 +183,8 @@ export default async function HomePage() {
             )}
           </div>
 
-          {/* Stats card */}
           <div className="animate-fade-up [animation-delay:120ms]">
             <div className="relative rounded-3xl border border-white/15 bg-white/5 p-6 backdrop-blur-md sm:p-8 overflow-hidden animate-glow-expand">
-              {/* Shining light wave effect */}
               <div
                 className="absolute inset-0 animate-light-wave pointer-events-none"
                 style={{
@@ -210,8 +192,6 @@ export default async function HomePage() {
                   backgroundSize: '200% 100%',
                 }}
               />
-              
-              {/* Animated shine effect */}
               <div
                 className="absolute inset-0 animate-shine"
                 style={{
@@ -219,8 +199,6 @@ export default async function HomePage() {
                   backgroundSize: '200% 100%',
                 }}
               />
-              
-              {/* Animated border glow */}
               <div
                 className="absolute inset-0 rounded-3xl opacity-0 animate-shine-border pointer-events-none"
                 style={{
@@ -263,7 +241,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ABOUT TEASER */}
       {r?.bio && (
         <section className="container-page py-20">
           <div className="grid gap-10 lg:grid-cols-[1fr_1.6fr] lg:items-center">
@@ -288,7 +265,6 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* FEATURED PAPERS */}
       {featuredPapers.length > 0 && (
         <section className="bg-ink-50 py-20">
           <div className="container-page">
@@ -312,7 +288,6 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* LATEST ARTICLES */}
       {latestArticles.length > 0 && (
         <section className="container-page py-20">
           <div className="flex items-end justify-between">
@@ -334,7 +309,6 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* CTA */}
       <section className="container-page pb-24">
         <div className="overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-600 to-indigo-800 px-8 py-14 text-center text-white sm:px-16">
           <h2 className="font-serif text-3xl font-bold sm:text-4xl">Let&apos;s build something meaningful</h2>
@@ -358,7 +332,6 @@ function Stat({ icon, value, label, isLink }: { icon: React.ReactNode; value: nu
     <div className={`relative rounded-2xl bg-white/5 p-4 text-center transition-all duration-300 ${
       isLink ? 'cursor-pointer hover:bg-white/10 hover:border-indigo-400/50 border border-transparent group overflow-hidden' : ''
     }`}>
-      {/* Hover shine effect for interactive stats */}
       {isLink && (
         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{
           background: 'radial-gradient(circle at 50% 50%, rgba(129, 140, 248, 0.2), transparent)',
@@ -377,7 +350,6 @@ function Stat({ icon, value, label, isLink }: { icon: React.ReactNode; value: nu
         isLink ? 'text-ink-300 group-hover:text-indigo-200' : 'text-ink-300'
       }`}>{label}</div>
       
-      {/* Bottom accent line for interactive stats */}
       {isLink && (
         <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-indigo-400 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-300" />
       )}
