@@ -74,32 +74,15 @@ export default async function HomePage() {
       getNotices(),
     ]);
   } catch {
-    researcher = dummyResearcher;
-    stats = dummyStats;
-    papers = dummyPapers;
-    articles = dummyArticles;
-    notices = dummyNotices;
+    // will fallback below
   }
 
-  // try {
-  //   [researcher, stats, papers, articles, notices] = await Promise.all([
-  //     getResearcher(),
-  //     getStats(),
-  //     getPapers(),
-  //     getArticles(),
-  //     getNotices(),
-  //   ]);
-  // } catch {
-  //   // will fallback below
-  // }
-
-  // // Fallback to dummy data when API returns empty
-  // if (!researcher || (Array.isArray(researcher) && researcher.length === 0)) researcher = dummyResearcher;
-  // if (!stats) stats = dummyStats;
-  // if (!papers || papers.length === 0) papers = dummyPapers;
-  // if (!articles || articles.length === 0) articles = dummyArticles;
-  // if (!notices || notices.length === 0) notices = dummyNotices;
-
+  // Fallback to dummy data when API returns empty
+  if (!researcher || (Array.isArray(researcher) && researcher.length === 0)) researcher = dummyResearcher;
+  if (!stats) stats = dummyStats;
+  if (!papers || papers.length === 0) papers = dummyPapers;
+  if (!articles || articles.length === 0) articles = dummyArticles;
+  if (!notices || notices.length === 0) notices = dummyNotices;
 
   const featuredPapers = papers.filter((p) => p.featured).slice(0, 3);
   const latestArticles = articles.slice(0, 3);
